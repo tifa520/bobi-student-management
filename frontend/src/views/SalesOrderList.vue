@@ -1,63 +1,133 @@
 <template>
-  <div class="sales-order-list">
-    <!-- 筛选栏 -->
-    <div class="filter-bar">
-      <el-input v-model="filters.search" placeholder="订单号/学员姓名" clearable style="width: 200px" @clear="fetchOrders" @keyup.enter="fetchOrders" />
-      <el-select v-model="filters.status" placeholder="订单状态" clearable style="width: 120px" @change="fetchOrders">
-        <el-option label="已支付" value="paid" />
-        <el-option label="已退款" value="refunded" />
-      </el-select>
-      <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="YYYY-MM-DD" style="width: 260px" @change="fetchOrders" />
-      <el-button type="primary" @click="fetchOrders">查询</el-button>
+  <div class="sales-order-list bobi-page">
+    <!-- 页面标题 -->
+    <div class="bobi-page-title">
+      <div>
+        <h1>销售订单</h1>
+        <p>查看和管理所有销售订单记录</p>
+      </div>
     </div>
 
-    <!-- 表格（宽度100%） -->
-    <el-table :data="orders" v-loading="loading" border stripe style="width: 100%">
-      <el-table-column prop="order_no" label="订单号" width="180" />
-      <el-table-column label="学员" width="180" fixed="left">
-        <template #default="{ row }">
-          <div style="display: flex; align-items: center; gap: 10px; height: 100%;">
-            <AppImage :src="row.student_avatar" :size="32" shape="circle" />
-            <span style="line-height: 1.4;">{{ row.student_name }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="student_phone" label="联系方式" width="130" />
-      <el-table-column label="应付金额" width="110">
-        <template #default="{ row }">¥{{ row.total_amount.toFixed(2) }}</template>
-      </el-table-column>
-      <el-table-column label="实付现金" width="110">
-        <template #default="{ row }">¥{{ row.paid_amount.toFixed(2) }}</template>
-      </el-table-column>
-      <el-table-column label="使用积分" width="100">
-        <template #default="{ row }">{{ row.used_points || 0 }}分</template>
-      </el-table-column>
-      <el-table-column label="支付方式" width="180">
-        <template #default="{ row }">
-          <div v-for="(p, idx) in row.payment_details" :key="idx" class="payment-item">
-            <span>{{ p.method }}: </span>
-            <span v-if="p.type === 'cash'">¥{{ p.amount }}</span>
-            <span v-else-if="p.type === 'points'">{{ p.points }}积分</span>
-            <span v-else>{{ p.amount ? '¥'+p.amount : (p.points||0)+'积分' }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态" width="100">
-        <template #default="{ row }">
-          <el-tag :type="row.status === 'paid' ? 'success' : 'danger'">{{ row.status === 'paid' ? '已支付' : '已退款' }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="160" />
-      <el-table-column label="操作" width="150" fixed="right">
-        <template #default="{ row }">
-          <el-button type="primary" link size="small" @click="viewDetail(row)">详情</el-button>
-          <el-button v-if="row.status === 'paid'" type="danger" link size="small" @click="refundOrder(row)">退款</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <!-- 筛选栏 -->
+    <div class="bobi-toolbar">
+      <div class="filters-left">
+        <el-input
+          v-model="filters.search"
+          placeholder="搜索订单号/学员姓名"
+          clearable
+          class="search-input"
+          @clear="fetchOrders"
+          @keyup.enter="fetchOrders"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
+        <el-select
+          v-model="filters.status"
+          placeholder="订单状态"
+          clearable
+          class="filter-select"
+          @change="fetchOrders"
+        >
+          <el-option label="已支付" value="paid" />
+          <el-option label="已退款" value="refunded" />
+        </el-select>
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="YYYY-MM-DD"
+          class="date-picker"
+          @change="fetchOrders"
+        />
+      </div>
+      <div class="filters-right">
+        <el-button type="primary" @click="fetchOrders">
+          <el-icon><Search /></el-icon>
+          查询
+        </el-button>
+      </div>
+    </div>
 
-    <div class="pagination-box" v-if="total > pageSize">
-      <el-pagination v-model:current-page="page" :page-size="pageSize" :total="total" layout="prev, pager, next" @current-change="fetchOrders" />
+    <!-- 表格区域 -->
+    <div class="table-section">
+      <el-table :data="orders" v-loading="loading" stripe style="width: 100%">
+        <el-table-column prop="order_no" label="订单号" width="180">
+          <template #default="{ row }">
+            <span class="order-no">{{ row.order_no }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="学员" width="180">
+          <template #default="{ row }">
+            <div class="student-cell">
+              <AppImage :src="row.student_avatar" :size="36" shape="circle" class="student-avatar" />
+              <div class="student-info">
+                <span class="student-name">{{ row.student_name }}</span>
+                <span class="student-phone">{{ row.student_phone }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="应付金额" width="120" align="right">
+          <template #default="{ row }">
+            <span class="amount-total">¥{{ row.total_amount.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="实付现金" width="120" align="right">
+          <template #default="{ row }">
+            <span class="amount-paid">¥{{ row.paid_amount.toFixed(2) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="使用积分" width="110" align="center">
+          <template #default="{ row }">
+            <el-tag size="small" type="warning" effect="light">{{ row.used_points || 0 }} 积分</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="支付方式" min-width="180">
+          <template #default="{ row }">
+            <div class="payment-list">
+              <div v-for="(p, idx) in row.payment_details" :key="idx" class="payment-item">
+                <span class="payment-method">{{ p.method }}</span>
+                <span class="payment-amount">
+                  <template v-if="p.type === 'cash'">¥{{ p.amount }}</template>
+                  <template v-else-if="p.type === 'points'">{{ p.points }}积分</template>
+                  <template v-else>{{ p.amount ? '¥'+p.amount : (p.points||0)+'积分' }}</template>
+                </span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="110" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'paid' ? 'success' : 'danger'" size="small" effect="light">
+              {{ row.status === 'paid' ? '已支付' : '已退款' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="created_at" label="创建时间" width="160" />
+        <el-table-column label="操作" width="140" fixed="right" align="center">
+          <template #default="{ row }">
+            <div class="action-buttons">
+              <el-button type="primary" link size="small" @click="viewDetail(row)">详情</el-button>
+              <el-button v-if="row.status === 'paid'" type="danger" link size="small" @click="refundOrder(row)">退款</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页 -->
+      <div class="pagination-wrapper" v-if="total > pageSize">
+        <el-pagination
+          v-model:current-page="page"
+          :page-size="pageSize"
+          :total="total"
+          layout="total, prev, pager, next"
+          @current-change="fetchOrders"
+        />
+      </div>
     </div>
 
     <!-- 订单详情弹窗 -->
@@ -95,6 +165,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 import request from '@/api/request'
 
 const orders = ref([])
@@ -167,57 +238,135 @@ onMounted(fetchOrders)
 </script>
 
 <style scoped>
-/* 完全参考 ScoreRecord.vue 结构，但移除容器 margin/padding，使其铺满父容器 */
 .sales-order-list {
   height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--app-bg);
-  /* 关键：移除所有外边距和内边距，让父容器决定 */
-  margin: 0;
-  padding: 0;
+  gap: var(--space-4);
 }
 
-/* 筛选栏样式（与 ScoreRecord 类似，但保留内边距不影响表格宽度） */
-.filter-bar {
+.filters-left {
   display: flex;
-  gap: 12px;
   align-items: center;
-  margin-bottom: 0;         /* 改为0，让筛选栏紧贴顶部 */
-  padding: 16px 20px;       /* 保留内边距，但左右20px不影响表格宽度（表格已100%） */
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-light);
+  gap: var(--space-3);
   flex-wrap: wrap;
-  flex-shrink: 0;
 }
 
-/* 表格本身已经 width:100%，无需额外设置 */
-.el-table {
-  flex: 1;
-  width: 100%;
-  margin: 0;
-}
-
-/* 分页栏 */
-.pagination-box {
-  margin-top: 0;
-  padding: 16px 20px;
-  background: var(--surface);
-  border-top: 1px solid var(--border-light);
+.filters-right {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.search-input {
+  width: 240px;
+}
+
+.filter-select {
+  width: 130px;
+}
+
+.date-picker {
+  width: 280px;
+}
+
+.order-no {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.student-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-avatar {
   flex-shrink: 0;
+  border: 2px solid var(--brand-100);
 }
 
-/* 支付方式内部样式（不影响布局） */
+.student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.student-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.student-phone {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.amount-total {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.amount-paid {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--brand-600);
+  font-size: 14px;
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .payment-item {
-  margin: 2px 0;
-  white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
 }
 
-/* 确保表格内部无额外空白 */
-.el-table__header-wrapper table,
-.el-table__body-wrapper table {
-  width: 100%;
+.payment-method {
+  color: var(--text-secondary);
+}
+
+.payment-amount {
+  font-weight: 600;
+  color: var(--text-regular);
+  font-family: var(--font-mono);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: center;
+  align-items: center;
+}
+
+.order-detail {
+  padding: 4px 0;
+}
+
+@media (max-width: 768px) {
+  .search-input,
+  .filter-select,
+  .date-picker {
+    width: 100%;
+  }
+  .filters-left,
+  .filters-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 </style>

@@ -1,69 +1,105 @@
 <template>
-  <div class="teacher-manage">
-    <div class="action-bar">
+  <div class="teacher-manage bobi-page">
+    <!-- 页面标题 -->
+    <div class="bobi-page-title">
+      <div>
+        <h1>教师管理</h1>
+        <p>管理机构的教师与工作人员信息</p>
+      </div>
+    </div>
+
+    <!-- 操作栏 -->
+    <div class="bobi-toolbar">
       <div class="left-actions">
-        <el-button type="primary" @click="openCreate">+ 新增教师</el-button>
+        <el-button type="primary" @click="openCreate">
+          <el-icon><Plus /></el-icon>
+          新增教师
+        </el-button>
       </div>
       <div class="right-actions">
         <el-input
           v-model="searchKeyword"
-          placeholder="请输入教师姓名"
+          placeholder="搜索教师姓名或电话"
           clearable
-          style="width: 200px"
+          class="search-input"
           @input="filterList"
-        />
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
       </div>
     </div>
 
-    <el-table
-      :data="filteredTeachers"
-      v-loading="loading"
-      border
-      stripe
-      style="width: 100%"
-    >
-      <el-table-column prop="name" label="姓名" min-width="120">
-        <template #default="{ row }">
-          <el-link type="primary" @click="openEdit(row)">{{ row.name }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" label="电话号码" min-width="150" />
-      <el-table-column prop="role" label="角色" width="120">
-        <template #default="{ row }">
-          {{ getRoleText(row.role) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" width="100" align="center">
-        <template #default="{ row }">
-          <el-switch
-            v-model="row.is_enabled"
-            active-color="#36b459"
-            inactive-color="#c0c4cc"
-            @change="(val) => toggleStatus(row, val)"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="120" fixed="right" align="center">
-        <template #default="{ row }">
-          <div class="action-links">
-            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table>
+    <!-- 表格区域 -->
+    <div class="table-section">
+      <el-table
+        :data="filteredTeachers"
+        v-loading="loading"
+        stripe
+        style="width: 100%"
+      >
+        <el-table-column prop="name" label="姓名" min-width="140">
+          <template #default="{ row }">
+            <div class="teacher-cell">
+              <div class="teacher-avatar">
+                {{ row.name?.charAt(0) || '?' }}
+              </div>
+              <div class="teacher-info">
+                <span class="teacher-name">{{ row.name }}</span>
+                <span class="teacher-role-tag">{{ getRoleText(row.role) }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="phone" label="联系电话" min-width="160">
+          <template #default="{ row }">
+            <span class="phone-text">{{ row.phone || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="角色" width="140" align="center">
+          <template #default="{ row }">
+            <el-tag :type="getRoleTagType(row.role)" size="small" effect="light">
+              {{ getRoleText(row.role) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="120" align="center">
+          <template #default="{ row }">
+            <div class="status-cell">
+              <span class="status-dot" :class="{ active: row.is_enabled }"></span>
+              <span class="status-text">{{ row.is_enabled ? '在职' : '停用' }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right" align="center">
+          <template #default="{ row }">
+            <div class="action-buttons">
+              <el-button type="primary" link size="small" @click="openEdit(row)">编辑</el-button>
+              <el-button type="primary" link size="small" @click="toggleStatus(row, !row.is_enabled)">
+                {{ row.is_enabled ? '停用' : '启用' }}
+              </el-button>
+              <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
+    <!-- 新增/编辑弹窗 -->
     <el-dialog
       v-model="formVisible"
       :title="editing ? '编辑教师' : '新增教师'"
-      width="400px"
+      width="480px"
       :close-on-click-modal="false"
+      class="bobi-dialog"
     >
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="90px">
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" placeholder="请输入姓名" />
+          <el-input v-model="form.name" placeholder="请输入教师姓名" />
         </el-form-item>
-        <el-form-item label="电话" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入电话号码" />
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="form.phone" placeholder="请输入手机号码" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
           <el-select v-model="form.role" placeholder="请选择角色" style="width: 100%">
@@ -78,7 +114,9 @@
       </el-form>
       <template #footer>
         <el-button @click="formVisible = false">取消</el-button>
-        <el-button type="primary" @click="save" :loading="saving">保存</el-button>
+        <el-button type="primary" @click="save" :loading="saving">
+          {{ editing ? '保存修改' : '确认新增' }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -87,6 +125,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Search } from '@element-plus/icons-vue'
 import {
   getTeacherList,
   createTeacher,
@@ -130,6 +169,18 @@ const roleMap = {
 
 function getRoleText(role) {
   return roleMap[role] || role
+}
+
+function getRoleTagType(role) {
+  const typeMap = {
+    full_time_teacher: 'success',
+    part_time_teacher: 'warning',
+    sales: 'primary',
+    reception: 'info',
+    finance: '',
+    principal: 'danger'
+  }
+  return typeMap[role] || 'info'
 }
 
 const filteredTeachers = computed(() => {
@@ -249,22 +300,113 @@ onMounted(() => {
   gap: var(--space-4);
 }
 
-.action-bar {
-  flex-shrink: 0;
+.left-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   gap: var(--space-3);
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
 }
 
-.left-actions { display: flex; gap: var(--space-3); }
-.right-actions { display: flex; align-items: center; gap: var(--space-2); }
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
-.action-links { display: flex; gap: var(--space-2); justify-content: center; }
+.search-input {
+  width: 260px;
+}
+
+.teacher-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.teacher-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-400), var(--brand-600));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 12px rgba(30, 168, 82, 0.25);
+}
+
+.teacher-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.teacher-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.teacher-role-tag {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.phone-text {
+  font-family: var(--font-mono);
+  color: var(--text-regular);
+  font-size: 13px;
+}
+
+.status-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-300);
+  box-shadow: 0 0 0 4px rgba(185, 194, 181, 0.2);
+  transition: all 0.3s ease;
+}
+
+.status-dot.active {
+  background: var(--success);
+  box-shadow: 0 0 0 4px rgba(30, 168, 82, 0.15);
+  animation: pulse-glow 2s infinite;
+}
+
+.status-text {
+  font-size: 13px;
+  color: var(--text-regular);
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(30, 168, 82, 0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(30, 168, 82, 0.05); }
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    width: 100%;
+  }
+  .left-actions,
+  .right-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
 </style>

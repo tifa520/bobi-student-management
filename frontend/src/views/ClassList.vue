@@ -1,33 +1,51 @@
 <template>
-  <div class="class-manage">
+  <div class="class-manage bobi-page">
+    <!-- 页面标题 -->
+    <div class="bobi-page-title">
+      <div>
+        <h1>班级管理</h1>
+        <p>查看和管理所有班级信息，进行排课与学员管理</p>
+      </div>
+    </div>
+
     <!-- 操作栏 -->
-    <div class="action-bar">
+    <div class="bobi-toolbar">
       <div class="left-actions">
-        <el-button type="primary" @click="openCreateDialog">+新建班级</el-button>
-        <el-button>导出考勤表</el-button>
+        <el-button type="primary" @click="openCreateDialog">
+          <el-icon><Plus /></el-icon>
+          新建班级
+        </el-button>
+        <el-button>
+          <el-icon><Download /></el-icon>
+          导出考勤表
+        </el-button>
       </div>
       <div class="right-actions">
         <el-input
           v-model="searchKeyword"
-          placeholder="请输入班级名称"
+          placeholder="搜索班级名称"
           clearable
-          style="width:200px"
+          class="search-input"
           @input="fetchList"
-        />
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
         <el-select
           v-model="filters.teacherId"
-          placeholder="老师"
+          placeholder="任课教师"
           clearable
-          style="width:140px; margin-left:8px"
+          class="filter-select"
           @change="fetchList"
         >
           <el-option v-for="t in teachers" :key="t.id" :label="t.name" :value="t.id" />
         </el-select>
         <el-select
           v-model="filters.stageId"
-          placeholder="课阶"
+          placeholder="课阶筛选"
           clearable
-          style="width:140px; margin-left:8px"
+          class="filter-select"
           @change="fetchList"
         >
           <el-option v-for="s in allStages" :key="s.id" :label="s.name" :value="s.id" />
@@ -35,93 +53,83 @@
       </div>
     </div>
 
-    <el-table :data="tableData" v-loading="loading" border stripe style="width:100%" class="class-table">
-      <el-table-column prop="name" label="班级" min-width="150">
-        <template #default="{ row }">
-          <el-link type="primary" class="class-name-link" @click="goToDetail(row.id)">{{ row.name }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="课程" min-width="120">
-        <template #header>
-          <div class="filter-header">
-            <span>课程</span>
-            <el-dropdown @command="(val) => filterBy('course_name', val)">
-              <el-icon class="filter-icon"><ArrowDown /></el-icon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="null">全部</el-dropdown-item>
-                  <el-dropdown-item v-for="c in courseOptions" :key="c" :command="c">{{ c }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </template>
-        <template #default="{ row }">{{ row.course_name }}</template>
-      </el-table-column>
-      <el-table-column label="课阶" min-width="120">
-        <template #header>
-          <div class="filter-header">
-            <span>课阶</span>
-            <el-dropdown @command="(val) => filterBy('stage_name', val)">
-              <el-icon class="filter-icon"><ArrowDown /></el-icon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="null">全部</el-dropdown-item>
-                  <el-dropdown-item v-for="s in stageOptionsFilter" :key="s" :command="s">{{ s }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </template>
-        <template #default="{ row }">{{ row.stage_name || '-' }}</template>
-      </el-table-column>
-      <el-table-column label="任课教师" min-width="120">
-        <template #header>
-          <div class="filter-header">
-            <span>任课教师</span>
-            <el-dropdown @command="(val) => filterBy('teacher_name', val)">
-              <el-icon class="filter-icon"><ArrowDown /></el-icon>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="null">全部</el-dropdown-item>
-                  <el-dropdown-item v-for="t in teacherOptions" :key="t" :command="t">{{ t }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </template>
-        <template #default="{ row }">{{ row.teacher_name }}</template>
-      </el-table-column>
-      <el-table-column prop="classroom_name" label="上课教室" min-width="120" />
-      <el-table-column label="状态" min-width="100">
-        <template #default="{ row }">
-          <el-tag :type="row.status === 'active' ? 'success' : 'info'" size="small">
-            {{ row.status === 'active' ? '未结课' : '已结课' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="student_count" label="学员数" min-width="80" />
-      <el-table-column label="下次上课时间" min-width="220">
-        <template #default="{ row }">{{ formatNextSessionTime(row.next_session_time, row.duration) }}</template>
-      </el-table-column>
-      <el-table-column label="操作" width="150" fixed="right">
-        <template #default="{ row }">
-          <div class="action-links">
-            <el-button type="primary" link class="action-link" @click="openScheduleDrawer(row)">排课</el-button>
-            <el-button type="primary" link class="action-link" @click="goToDetail(row.id, 'schedule')">课表</el-button>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table>
+    <!-- 班级列表 -->
+    <div class="table-section">
+      <el-table :data="tableData" v-loading="loading" stripe style="width: 100%" class="class-table">
+        <el-table-column prop="name" label="班级" min-width="180">
+          <template #default="{ row }">
+            <div class="class-cell">
+              <div class="class-icon">
+                <el-icon><School /></el-icon>
+              </div>
+              <div class="class-info">
+                <el-link type="primary" class="class-name-link" @click="goToDetail(row.id)">{{ row.name }}</el-link>
+                <span class="class-course">{{ row.course_name }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="课阶" min-width="120" align="center">
+          <template #default="{ row }">
+            <el-tag v-if="row.stage_name" type="primary" size="small" effect="light">
+              {{ row.stage_name }}
+            </el-tag>
+            <span v-else class="text-muted">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="任课教师" min-width="120" align="center">
+          <template #default="{ row }">
+            <div class="teacher-cell">
+              <div class="teacher-avatar-sm">
+                {{ row.teacher_name?.charAt(0) || '?' }}
+              </div>
+              <span>{{ row.teacher_name || '未分配' }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="classroom_name" label="上课教室" min-width="120" align="center" />
+        <el-table-column label="状态" min-width="100" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'active' ? 'success' : 'info'" size="small" effect="light">
+              {{ row.status === 'active' ? '未结课' : '已结课' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="学员数" min-width="90" align="center">
+          <template #default="{ row }">
+            <span class="student-count">{{ row.student_count || 0 }}</span>
+            <span class="count-unit">人</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="下次上课时间" min-width="220">
+          <template #default="{ row }">
+            <div v-if="row.next_session_time" class="next-session">
+              <el-icon><Clock /></el-icon>
+              <span>{{ formatNextSessionTime(row.next_session_time, row.duration) }}</span>
+            </div>
+            <span v-else class="text-muted">暂无排课</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right" align="center">
+          <template #default="{ row }">
+            <div class="action-buttons">
+              <el-button type="primary" link size="small" @click="openScheduleDrawer(row)">排课</el-button>
+              <el-button type="primary" link size="small" @click="goToDetail(row.id, 'schedule')">详情</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <div class="pagination-box" v-if="total > pageSize">
-      <el-pagination
-        v-model:current-page="page"
-        :page-size="pageSize"
-        :total="total"
-        layout="total, prev, pager, next"
-        @current-change="fetchList"
-      />
+      <!-- 分页 -->
+      <div class="pagination-wrapper" v-if="total > pageSize">
+        <el-pagination
+          v-model:current-page="page"
+          :page-size="pageSize"
+          :total="total"
+          layout="total, prev, pager, next"
+          @current-change="fetchList"
+        />
+      </div>
     </div>
 
     <!-- 新增班级弹窗 -->
@@ -275,7 +283,7 @@
 import { ref, reactive, computed, onMounted, onActivated, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { Plus, Download, Search, School, Clock } from '@element-plus/icons-vue'
 import TimePicker from '@/components/TimePicker.vue'
 // ★ 修复：添加 createSchedule 导入
 import { getClassList, createClass, getClassSchedules, deleteSchedule, createSchedule } from '@/api/class'
@@ -627,47 +635,126 @@ onActivated(() => {
   gap: var(--space-4);
 }
 
-.action-bar {
-  flex-shrink: 0;
+.left-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   gap: var(--space-3);
-  padding: var(--space-4);
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
 }
 
-.left-actions { display: flex; gap: var(--space-3); }
-.right-actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.search-input {
+  width: 240px;
+}
+
+.filter-select {
+  width: 140px;
+}
 
 .class-table {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  background: var(--surface);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
+  border-radius: 0;
+  border: none;
 }
 
-.class-name-link { color: var(--brand-600); font-weight: 600; }
-.class-name-link:hover { color: var(--brand-700); }
+.class-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-.filter-header { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-.filter-icon { font-size: 14px; color: var(--text-secondary); }
-
-.action-links { display: flex; gap: var(--space-2); white-space: nowrap; }
-.action-link { font-size: 14px; }
-
-.pagination-box {
+.class-icon {
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand-300), var(--brand-500));
+  color: #fff;
+  font-size: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(30, 168, 82, 0.25);
+}
+
+.class-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.class-name-link {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.class-course {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.teacher-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-avatar-sm {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-500));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.student-count {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--brand-600);
+  font-family: var(--font-mono);
+}
+
+.count-unit {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.next-session {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-regular);
+}
+
+.next-session .el-icon {
+  color: var(--brand-500);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination-wrapper {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-light);
+  background: var(--surface-soft);
+  display: flex;
   justify-content: flex-end;
-  padding-top: var(--space-3);
 }
 
 .custom-drawer :deep(.el-drawer) {
@@ -676,32 +763,69 @@ onActivated(() => {
   right: auto;
   max-width: none;
 }
+
 .custom-drawer :deep(.el-drawer__header) {
   margin-bottom: 0;
 }
 
-.schedule-layout { display: flex; height: 100%; }
+.schedule-layout {
+  display: flex;
+  height: 100%;
+}
+
 .schedule-left {
   width: 60%;
   border-right: 1px solid var(--border-light);
   padding: 0 var(--space-5);
   overflow-y: auto;
 }
-.schedule-left .schedule-title { margin-bottom: 14px; font-weight: 700; }
-.schedule-right { flex: 1; padding: 0 var(--space-4); overflow-y: auto; }
 
-.schedule-form { display: flex; flex-direction: column; gap: var(--space-4); }
-.form-item-row { display: flex; gap: var(--space-4); }
-.form-item-row .el-form-item { flex: 1; }
+.schedule-left .schedule-title {
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: var(--font-display);
+}
 
-.schedule-list { margin-top: var(--space-4); }
-.schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
-.schedule-item:last-child { border-bottom: none; }
-.schedule-item-left { display: flex; align-items: center; gap: var(--space-2); }
-.schedule-item-right { display: flex; align-items: center; gap: var(--space-2); }
+.schedule-right {
+  flex: 1;
+  padding: 0 var(--space-4);
+  overflow-y: auto;
+}
+
+.schedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.form-item-row {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.form-item-row .el-form-item {
+  flex: 1;
+}
 
 @media (max-width: 768px) {
-  .schedule-layout { flex-direction: column; }
-  .schedule-left { width: 100%; border-right: none; border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-4); }
+  .schedule-layout {
+    flex-direction: column;
+  }
+  .schedule-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: var(--space-4);
+  }
+  .search-input,
+  .filter-select {
+    width: 100%;
+  }
+  .left-actions,
+  .right-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 </style>
