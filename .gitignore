@@ -1,0 +1,46 @@
+# 依赖
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.venv/
+venv/
+env/
+
+# 数据与日志
+data/
+logs/
+redis-data/
+media/
+uploads/
+
+# 前端构建产物（可选，根据是否需要在仓库中保留）
+frontend/dist/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 临时文件
+*.tmp
+*.bak
+*.log
+*.zip

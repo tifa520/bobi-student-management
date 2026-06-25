@@ -1,0 +1,64 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    container_name: bobi-frontend
+    ports:
+      - "5050:80"
+    networks:
+      - bobi-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: bobi-backend
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./media:/app/media
+      - ./uploads:/app/uploads
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - DATABASE_URL=sqlite:///data/app.db
+      - SECRET_KEY=${SECRET_KEY:-your-very-secret-key-change-in-production}
+      - ENABLE_AUTH_MIDDLEWARE=${ENABLE_AUTH_MIDDLEWARE:-true}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-120}
+      - TZ=Asia/Shanghai
+      - REDIS_URL=redis://redis:6379/0
+      - ENABLE_MONITORING=true
+      - LOG_LEVEL=INFO
+    networks:
+      - bobi-net
+    depends_on:
+      - redis
+    # 改为单 worker 避免 SQLite 并发冲突
+    command: uvicorn app.main:app --host 0.0.0.0 --port 5050 --workers 1 --loop asyncio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5050/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: bobi-redis
+    command: redis-server --appendonly yes --appendfsync everysec --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - ./redis-data:/data
+    networks:
+      - bobi-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  bobi-net:
+    driver: bridge

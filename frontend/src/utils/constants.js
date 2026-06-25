@@ -1,0 +1,2 @@
+// 默认头像 SVG（绿色背景白色人形）
+export const DEFAULT_AVATAR_SVG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%2336b459"/%3E%3Ccircle cx="50" cy="35" r="20" fill="%23ffffff"/%3E%3Cpath d="M25 70 Q50 85 75 70" stroke="%23ffffff" stroke-width="6" fill="none" stroke-linecap="round"/%3E%3C/svg%3E'

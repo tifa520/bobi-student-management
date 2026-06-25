@@ -1,0 +1,617 @@
+/* ============================================================
+   Bobi Design System v19 - Neo Minimal
+   关键词：简约、现代、合理、新颖、低噪声、清晰层级
+   ============================================================ */
+
+:root {
+  /* 品牌色 */
+  --brand-50: #eef9f1;
+  --brand-100: #dcf2e2;
+  --brand-200: #b9e4c5;
+  --brand-300: #8fd19f;
+  --brand-400: #5fbd75;
+  --brand-500: #32a852;
+  --brand-600: #248a40;
+  --brand-700: #1e6f36;
+  --brand-800: #19582d;
+  --brand-900: #144625;
+
+  /* 中性色 */
+  --gray-0: #ffffff;
+  --gray-25: #fcfcf9;
+  --gray-50: #f7f8f4;
+  --gray-100: #eef1eb;
+  --gray-200: #e0e5dc;
+  --gray-300: #cbd4c8;
+  --gray-400: #9aa79d;
+  --gray-500: #6f7d73;
+  --gray-600: #505f55;
+  --gray-700: #334238;
+  --gray-800: #213126;
+  --gray-900: #111f17;
+
+  /* 语义色 */
+  --success: #32a852;
+  --warning: #d99628;
+  --danger: #e05252;
+  --info: #4d7ca8;
+
+  /* 背景与文本 */
+  --app-bg: #f5f6f1;
+  --surface: #ffffff;
+  --surface-soft: #f8faf6;
+  --surface-muted: #f1f4ef;
+  --surface-green: #eff8f2;
+  --surface-glass: rgba(255, 255, 255, 0.78);
+  --text-primary: var(--gray-900);
+  --text-regular: var(--gray-700);
+  --text-secondary: var(--gray-500);
+  --text-placeholder: var(--gray-400);
+  --border-color: var(--gray-200);
+  --border-light: #e9eee8;
+  --border-subtle: rgba(17, 31, 23, 0.06);
+
+  /* 尺寸 */
+  --control-height: 34px;
+  --control-height-sm: 28px;
+  --control-height-lg: 42px;
+  --header-height: 68px;
+  --tags-height: 46px;
+  --sidebar-width: 216px;
+  --sidebar-collapse-width: 72px;
+
+  /* 圆角：字段胶囊，容器常规 */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 30px;
+  --radius-pill: 999px;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(17, 31, 23, 0.04);
+  --shadow-sm: 0 10px 26px rgba(17, 31, 23, 0.06);
+  --shadow-md: 0 18px 46px rgba(17, 31, 23, 0.09);
+  --shadow-lg: 0 28px 70px rgba(17, 31, 23, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(50, 168, 82, 0.14);
+  --shadow-lift: 0 16px 34px rgba(50, 168, 82, 0.12);
+
+  /* 间距 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* 字体 */
+  --font-sans: "HarmonyOS Sans SC", "MiSans", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+
+  /* Element Plus 主题变量 */
+  --el-color-primary: var(--brand-500);
+  --el-color-primary-light-3: var(--brand-300);
+  --el-color-primary-light-5: var(--brand-200);
+  --el-color-primary-light-7: var(--brand-100);
+  --el-color-primary-light-8: var(--brand-50);
+  --el-color-primary-light-9: var(--surface-green);
+  --el-color-primary-dark-2: var(--brand-700);
+  --el-bg-color: var(--surface);
+  --el-bg-color-page: var(--app-bg);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-regular);
+  --el-text-color-secondary: var(--text-secondary);
+  --el-text-color-placeholder: var(--text-placeholder);
+  --el-border-color: var(--border-color);
+  --el-border-color-light: var(--border-light);
+  --el-border-radius-base: var(--radius-pill);
+  --el-border-radius-small: var(--radius-pill);
+  --el-border-radius-round: var(--radius-pill);
+  --el-component-size: var(--control-height);
+  --el-font-size-base: 14px;
+  --el-font-size-small: 12px;
+  --el-font-size-large: 16px;
+  --el-form-label-font-size: 14px;
+  --el-input-padding-horizontal: 12px;
+  --el-transition-duration: 0.18s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(50, 168, 82, 0.12), transparent 310px),
+    radial-gradient(circle at 92% 10%, rgba(77, 124, 168, 0.08), transparent 340px),
+    linear-gradient(180deg, #fbfcf8 0%, var(--app-bg) 100%);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(17, 31, 23, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 31, 23, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.38), transparent 72%);
+}
+
+a {
+  color: var(--brand-600);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--brand-700);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(113, 129, 118, 0.35);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 96, 87, 0.5);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ============================================================
+   Element Plus 基础规范：少量、低侵入、无
+   ============================================================ */
+
+.el-button:not(.is-circle):not(.is-link):not([link]) {
+  min-width: 88px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-pill);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.el-button:not(.is-disabled):not(.is-circle):not(.is-link):not([link]):hover {
+  transform: translateY(-1px);
+}
+
+.el-button--primary:not(.is-disabled):not(.is-link):not([link]) {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  box-shadow: 0 8px 18px rgba(50, 168, 82, 0.18);
+}
+
+.el-button--primary:not(.is-disabled):not(.is-link):not([link]):hover {
+  box-shadow: var(--shadow-lift);
+}
+
+.el-button--small:not(.is-circle):not(.is-link):not([link]) {
+  min-width: 64px;
+}
+
+.el-button.is-circle {
+  width: var(--control-height);
+  height: var(--control-height);
+}
+
+.el-button.is-link,
+.el-button[link] {
+  min-width: auto;
+  padding: 0 4px;
+}
+
+.el-input__wrapper,
+.el-select .el-input__wrapper,
+.el-date-editor .el-input__wrapper,
+.el-cascader .el-input__wrapper {
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 0 0 1px var(--border-subtle) inset;
+  transition: box-shadow var(--el-transition-duration), background var(--el-transition-duration);
+}
+
+.el-input__wrapper:hover,
+.el-select .el-input__wrapper:hover,
+.el-date-editor .el-input__wrapper:hover,
+.el-cascader .el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px rgba(54, 180, 89, 0.42) inset;
+}
+
+.el-input__wrapper.is-focus,
+.el-select .el-input__wrapper.is-focus,
+.el-date-editor .el-input__wrapper.is-focus,
+.el-cascader .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--brand-500) inset, var(--shadow-focus);
+}
+
+.el-textarea .el-textarea__inner {
+  border-radius: var(--radius-md);
+  line-height: 1.65;
+}
+
+.el-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.el-card:hover {
+  border-color: rgba(50, 168, 82, 0.16);
+  box-shadow: var(--shadow-sm);
+}
+
+.el-card__header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-light);
+  font-weight: 700;
+}
+
+.el-card__body {
+  padding: 18px;
+}
+
+.el-dialog,
+.el-message-box,
+.el-popover,
+.el-dropdown-menu,
+.el-picker-panel {
+  border-radius: var(--radius-lg);
+}
+
+.el-dialog {
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.el-dialog__header {
+  padding: 18px 22px 12px;
+  margin-right: 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.el-dialog__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.el-dialog__body {
+  padding: 20px 22px;
+}
+
+.el-dialog__footer {
+  padding: 12px 22px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.el-table {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  color: var(--text-regular);
+  background: var(--surface);
+}
+
+.el-table th.el-table__cell {
+  background: linear-gradient(180deg, var(--surface-soft), var(--surface-muted));
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.el-table .el-table__row {
+  transition: background 0.16s ease;
+}
+
+.el-table .el-table__row:hover > td.el-table__cell {
+  background: var(--brand-50);
+}
+
+.el-table td.el-table__cell,
+.el-table th.el-table__cell {
+  border-bottom-color: var(--border-light);
+}
+
+.el-tag {
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  border-color: transparent;
+}
+
+.el-tabs__header {
+  margin: 0 0 var(--space-4);
+}
+
+.el-form-item {
+  margin-bottom: 18px;
+}
+
+.el-form-item__label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.el-pagination {
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   应用布局与页面通用壳层
+   ============================================================ */
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.app-topbar-shell {
+  height: var(--header-height);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  gap: 14px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 14px 14px;
+}
+
+.app-aside {
+  flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(18px);
+  transition: width 0.22s ease, box-shadow 0.22s ease;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+}
+
+.page-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+  scroll-behavior: smooth;
+}
+
+.page-content > * {
+  animation: bobi-page-in 0.28s ease both;
+}
+
+:where(
+  .dashboard-main,
+  .enroll-page,
+  .page-container,
+  .attendance,
+  .stats-page,
+  .activity-manage,
+  .class-manage,
+  .course-manage,
+  .package-manage,
+  .student-list,
+  .salary-manage,
+  .settings-page,
+  .course-record-container,
+  .teacher-manage,
+  .item-manage,
+  .item-sale-exchange,
+  .order-page,
+  .score-record-container,
+  .classroom-manage,
+  .sales-order-list,
+  .score-manage-modern,
+  .inventory-record-page,
+  .teacher-salary-list,
+  .salary-rule-list,
+  .performance-manage,
+  .operation-logs
+) {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 页面常用构件：新页面优先使用这些类，减少局部重复 */
+.bobi-page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.bobi-toolbar,
+.filter-bar,
+.search-bar,
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: 14px 16px;
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: blur(12px);
+}
+
+.bobi-panel,
+.content-card,
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.bobi-panel:hover,
+.content-card:hover,
+.table-card:hover {
+  border-color: rgba(50, 168, 82, 0.14);
+  box-shadow: var(--shadow-sm);
+}
+
+.bobi-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.bobi-section-title::before {
+  content: "";
+  width: 5px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--brand-300), var(--brand-700));
+  box-shadow: 0 0 0 4px rgba(50, 168, 82, 0.08);
+}
+
+.bobi-page-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.bobi-page-title h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.bobi-page-title p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+@keyframes bobi-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}
+
+/* 辅助类 */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.text-primary { color: var(--brand-600); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-muted { color: var(--text-secondary); }
+.cursor-pointer { cursor: pointer; }
+.flex-1 { flex: 1; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-column { display: flex; flex-direction: column; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.overflow-hidden { overflow: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+    --tags-height: 42px;
+  }
+  .app-body {
+    padding: 0 var(--space-3) var(--space-3);
+    gap: var(--space-3);
+  }
+  .page-content {
+    padding: var(--space-3);
+  }
+  .bobi-toolbar,
+  .filter-bar,
+  .search-bar,
+  .toolbar {
+    padding: var(--space-3);
+  }
+  .el-dialog {
+    width: min(94vw, 720px);
+  }
+}
