@@ -5,7 +5,8 @@ from app.database import init_db
 from app.routers import (
     student, enroll, attendance, class_, course, teacher, classroom,
     score, gift, purchase, activity, order, course_record, refund, change_log, 
-    auth, dashboard, item, misc_fee, upload, settings, birthday, stats
+    auth, dashboard, item, misc_fee, upload, settings, birthday, stats,
+    student_portal
 )
 from app.config import APP_NAME, APP_VERSION, ENABLE_AUTH_MIDDLEWARE
 from app.middleware.auth import AuthMiddleware
@@ -84,6 +85,7 @@ app.include_router(birthday.router, prefix="/api", tags=["生日提醒"])
 app.include_router(sales.router, prefix="/api", tags=["销售订单"])
 app.include_router(salary.router, prefix="/api", tags=["课酬提成"])
 app.include_router(stats.router, prefix="/api", tags=["统计"])
+app.include_router(student_portal.router, prefix="/api", tags=["学员门户"])
 
 # 健康检查接口
 @app.get("/api/health")

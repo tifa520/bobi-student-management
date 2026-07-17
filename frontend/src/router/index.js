@@ -254,6 +254,13 @@ const routes = [
       }
     ]
   },
+  // ========== 学员移动端门户（独立 SPA，不使用 Layout） ==========
+  {
+    path: '/m',
+    name: 'MobilePortal',
+    component: () => import('@/views/MobilePortal.vue'),
+    meta: { title: '学员中心' }
+  },
   // ========== 404 重定向 ==========
   {
     path: '/:pathMatch(.*)*',
@@ -268,6 +275,12 @@ const router = createRouter({
 
 // ========== 路由守卫 ==========
 router.beforeEach(async (to, from, next) => {
+  // 学员移动端门户使用独立认证（m_token），跳过管理端认证
+  if (to.path.startsWith('/m')) {
+    next()
+    return
+  }
+
   const token = localStorage.getItem('access_token')
 
   // 未登录跳转登录页
